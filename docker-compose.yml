@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - eshop-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - eshop-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # API Service
+  apiservice:
+    build:
+      context: .
+      dockerfile: aspire-eshop-minimart.ApiService/Dockerfile
+    ports:
+      - "8080:8080"
+      - "3010:3010"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=sql;Database=defaultdb;User=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true
+      - ConnectionStrings__Redis=redis:6379
+    depends_on:
+      sql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - eshop-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Blazor Web Frontend
+  webfrontend:
+    build:
+      context: .
+      dockerfile: aspire-eshop-minimart.Web/Dockerfile
+    ports:
+      - "5100:5100"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5100
+      - ConnectionStrings__Redis=redis:6379
+      - ApiService__BaseUrl=http://apiservice:8080
+    depends_on:
+      apiservice:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - eshop-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5100/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # React Frontend
+  react-frontend:
+    build:
+      context: ./aspire-eshop-react
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:3010
+    depends_on:
+      apiservice:
+        condition: service_healthy
+    networks:
+      - eshop-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  eshop-network:
+    driver: bridge
+
+volumes:
+  sql_data:
+  redis_data:
