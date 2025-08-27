@@ -16,14 +16,6 @@ builder.Services.AddRazorComponents()
 // Add MudBlazor services
 builder.Services.AddMudServices();
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
-    {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://apiservice");
-        client.Timeout = TimeSpan.FromSeconds(30);
-    });
-
 builder.Services.AddHttpClient<ProductApiClient>(client =>
     {
         client.BaseAddress = new("https+http://apiservice");
