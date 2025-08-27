@@ -1,0 +1,55 @@
+@page "/products"
+@using aspire_eshop_minimart.Web
+@inject ProductApiClient ProductClient
+@rendermode InteractiveServer
+
+<PageTitle>Products</PageTitle>
+
+<h1>Products</h1>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!products.Any())
+{
+    <p><em>No products found.</em></p>
+}
+else
+{
+    <div class="row">
+        @foreach (var product in products)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                        <p class="card-text">
+                            <strong>Price:</strong> $@product.Price.ToString("F2")<br/>
+                            <strong>Stock:</strong> @product.StockQuantity<br/>
+                            <small class="text-muted">Added: @product.CreatedAt.ToString("yyyy-MM-dd")</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private Product[]? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            products = await ProductClient.GetProductsAsync();
+        }
+        catch
+        {
+            // In a real app, you'd want proper error handling/logging
+            products = [];
+        }
+    }
+}

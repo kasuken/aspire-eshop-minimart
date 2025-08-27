@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspire-eshop-minimart.AppHost", "aspire-eshop-minimart.AppHost\aspire-eshop-minimart.AppHost.csproj", "{E899B20F-18DE-4997-8B35-AD18E981538B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspire-eshop-minimart.ServiceDefaults", "aspire-eshop-minimart.ServiceDefaults\aspire-eshop-minimart.ServiceDefaults.csproj", "{7B90A4D7-BA68-79B7-777E-7640CB697A5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspire-eshop-minimart.ApiService", "aspire-eshop-minimart.ApiService\aspire-eshop-minimart.ApiService.csproj", "{8D9AD16C-6CD5-8982-9CF8-7FD6BB902660}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspire-eshop-minimart.Web", "aspire-eshop-minimart.Web\aspire-eshop-minimart.Web.csproj", "{782D6BAE-8401-8D08-BAE7-9019A335630B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspire-eshop-minimart.Tests", "aspire-eshop-minimart.Tests\aspire-eshop-minimart.Tests.csproj", "{44ED9C57-9920-EBE0-B928-EF82AA550374}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E899B20F-18DE-4997-8B35-AD18E981538B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E899B20F-18DE-4997-8B35-AD18E981538B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E899B20F-18DE-4997-8B35-AD18E981538B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E899B20F-18DE-4997-8B35-AD18E981538B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B90A4D7-BA68-79B7-777E-7640CB697A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B90A4D7-BA68-79B7-777E-7640CB697A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B90A4D7-BA68-79B7-777E-7640CB697A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B90A4D7-BA68-79B7-777E-7640CB697A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D9AD16C-6CD5-8982-9CF8-7FD6BB902660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D9AD16C-6CD5-8982-9CF8-7FD6BB902660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D9AD16C-6CD5-8982-9CF8-7FD6BB902660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D9AD16C-6CD5-8982-9CF8-7FD6BB902660}.Release|Any CPU.Build.0 = Release|Any CPU
+		{782D6BAE-8401-8D08-BAE7-9019A335630B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{782D6BAE-8401-8D08-BAE7-9019A335630B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{782D6BAE-8401-8D08-BAE7-9019A335630B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{782D6BAE-8401-8D08-BAE7-9019A335630B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44ED9C57-9920-EBE0-B928-EF82AA550374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44ED9C57-9920-EBE0-B928-EF82AA550374}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44ED9C57-9920-EBE0-B928-EF82AA550374}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44ED9C57-9920-EBE0-B928-EF82AA550374}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1071EECF-FB2C-445E-8B12-794C1D33AAF3}
+	EndGlobalSection
+EndGlobal
