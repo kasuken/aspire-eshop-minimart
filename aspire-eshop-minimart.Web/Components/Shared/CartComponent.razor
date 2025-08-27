@@ -4,18 +4,16 @@
 @rendermode InteractiveServer
 @implements IDisposable
 
-<div class="position-relative">
-    <button class="btn btn-outline-light position-relative" @onclick="NavigateToCart">
-        <i class="bi bi-cart3"></i>
-        @if (itemCount > 0)
-        {
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                @itemCount
-                <span class="visually-hidden">items in cart</span>
-            </span>
-        }
-    </button>
-</div>
+<MudBadge Content="@itemCount" 
+          Color="Color.Error" 
+          Visible="@(itemCount > 0)" 
+          Overlap="true" 
+          Class="mx-2">
+    <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" 
+                   Color="Color.Inherit" 
+                   OnClick="NavigateToCart"
+                   Size="Size.Medium" />
+</MudBadge>
 
 @code {
     private int itemCount = 0;

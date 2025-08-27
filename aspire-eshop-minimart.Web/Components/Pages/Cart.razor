@@ -3,142 +3,216 @@
 @using aspire_eshop_minimart.Web.Services
 @inject CartService CartService
 @inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 @implements IDisposable
 
 <PageTitle>Shopping Cart - Aspire eShop Minimart</PageTitle>
 
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Shopping Cart</h1>
-        <a href="/products" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-left me-1"></i>
-            Continue Shopping
-        </a>
-    </div>
+<MudContainer MaxWidth="MaxWidth.False">
+    <MudGrid AlignItems="Center.Center" Class="mb-4">
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h4">Shopping Cart</MudText>
+        </MudItem>
+        <MudItem xs="12" md="6" Class="text-right">
+            <MudButton Variant="Variant.Outlined" 
+                       StartIcon="@Icons.Material.Filled.ArrowBack"
+                       Href="/products"
+                       Color="Color.Primary">
+                Continue Shopping
+            </MudButton>
+        </MudItem>
+    </MudGrid>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>
+        <MudAlert Severity="Severity.Error" 
+                  ShowCloseIcon="true" 
+                  CloseIconClicked="() => errorMessage = null"
+                  Class="mb-4">
             @errorMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @onclick="() => errorMessage = null"></button>
-        </div>
+        </MudAlert>
     }
 
     @if (isLoading)
     {
-        <div class="text-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Loading your cart...</p>
-        </div>
+        <MudGrid Justify="Justify.Center" Class="pa-8">
+            <MudItem Class="text-center">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                <MudText Typo="Typo.h6" Class="mt-4">Loading your cart...</MudText>
+            </MudItem>
+        </MudGrid>
     }
     else if (cartItems == null || !cartItems.Any())
     {
-        <div class="text-center py-5">
-            <i class="bi bi-cart-x" style="font-size: 4rem; color: #6c757d;"></i>
-            <h3 class="text-muted mt-3">Your cart is empty</h3>
-            <p class="text-muted">Add some products to get started!</p>
-            <a href="/products" class="btn btn-primary">
-                <i class="bi bi-bag me-1"></i>
-                Start Shopping
-            </a>
-        </div>
+        <MudPaper Class="pa-8" Elevation="2">
+            <MudGrid Justify="Justify.Center">
+                <MudItem Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.RemoveShoppingCart" Style="font-size: 4rem;" Color="Color.Dark" />
+                    <MudText Typo="Typo.h5" Color="Color.Dark" Class="mt-3">Your cart is empty</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Dark" Class="mb-4">Add some products to get started!</MudText>
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary" 
+                               StartIcon="@Icons.Material.Filled.ShoppingBag"
+                               Href="/products"
+                               Size="Size.Large">
+                        Start Shopping
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
     }
     else
     {
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Cart Items (@cartItems.Sum(i => i.Quantity) items)</h5>
-                        <button class="btn btn-outline-danger btn-sm" @onclick="ClearCart">
-                            <i class="bi bi-trash me-1"></i>
+        <MudGrid>
+            <MudItem xs="12" lg="8">
+                <MudPaper Elevation="2">
+                    <MudToolBar>
+                        <MudText Typo="Typo.h6">Cart Items (@cartItems.Sum(i => i.Quantity) items)</MudText>
+                        <MudSpacer />
+                        <MudButton Variant="Variant.Outlined" 
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   OnClick="ClearCart"
+                                   Size="Size.Small">
                             Clear Cart
-                        </button>
-                    </div>
-                    <div class="card-body p-0">
-                        @foreach (var item in cartItems)
+                        </MudButton>
+                    </MudToolBar>
+                    <MudDivider />
+                    
+                    @foreach (var item in cartItems)
+                    {
+                        <div class="pa-4">
+                            <MudGrid AlignItems="Center.Center">
+                                <MudItem xs="12" sm="2">
+                                    <MudImage Src="@item.Product.ImageUrl" 
+                                              Alt="@item.Product.Name" 
+                                              Width="80" 
+                                              Height="80"
+                                              ObjectFit="ObjectFit.Cover"
+                                              Class="rounded" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudText Typo="Typo.h6" Class="mb-1">@item.Product.Name</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">
+                                        @item.Product.Category.Name
+                                    </MudChip>
+                                    <MudText Typo="Typo.body2" Color="Color.Dark" Class="mt-1">
+                                        $@item.Product.Price.ToString("F2") each
+                                    </MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="3">
+                                    <MudGrid AlignItems="Center.Center" Justify="Justify.Center">
+                                        <MudItem>
+                                            <MudIconButton Icon="@Icons.Material.Filled.Remove"
+                                                           Color="Color.Primary"
+                                                           Size="Size.Small"
+                                                           OnClick="() => UpdateQuantity(item.Id, item.Quantity - 1)" />
+                                        </MudItem>
+                                        <MudItem>
+                                            <MudTextField @bind-Value="@quantityValues[item.Id]"
+                                                          Variant="Variant.Outlined"
+                                                          Style="width: 80px;"
+                                                          InputType="InputType.Number"
+                                                          OnBlur="() => UpdateQuantityFromInput(item.Id, quantityValues[item.Id])" />
+                                        </MudItem>
+                                        <MudItem>
+                                            <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                                           Color="Color.Primary"
+                                                           Size="Size.Small"
+                                                           OnClick="() => UpdateQuantity(item.Id, item.Quantity + 1)" />
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudItem>
+                                <MudItem xs="12" sm="2" Class="text-center">
+                                    <MudText Typo="Typo.h6" Color="Color.Primary">
+                                        $@((item.Product.Price * item.Quantity).ToString("F2"))
+                                    </MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="1" Class="text-center">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                   Color="Color.Error"
+                                                   Size="Size.Small"
+                                                   OnClick="() => RemoveItem(item.Id)" />
+                                </MudItem>
+                            </MudGrid>
+                        </div>
+                        @if (item != cartItems.Last())
                         {
-                            <div class="border-bottom p-3">
-                                <div class="row align-items-center">
-                                    <div class="col-2">
-                                        <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
-                                    </div>
-                                    <div class="col-4">
-                                        <h6 class="mb-1">@item.Product.Name</h6>
-                                        <small class="text-muted">@item.Product.Category.Name</small>
-                                        <br>
-                                        <small class="text-muted">$@item.Product.Price.ToString("F2") each</small>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="input-group input-group-sm">
-                                            <button class="btn btn-outline-secondary" type="button" @onclick="() => UpdateQuantity(item.Id, item.Quantity - 1)">
-                                                <i class="bi bi-dash"></i>
-                                            </button>
-                                            <input type="number" class="form-control text-center" value="@item.Quantity" min="1" @onchange="@(async (e) => await UpdateQuantityFromInput(item.Id, e.Value?.ToString()))">
-                                            <button class="btn btn-outline-secondary" type="button" @onclick="() => UpdateQuantity(item.Id, item.Quantity + 1)">
-                                                <i class="bi bi-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="col-2 text-end">
-                                        <strong class="text-primary">$@((item.Product.Price * item.Quantity).ToString("F2"))</strong>
-                                    </div>
-                                    <div class="col-1 text-end">
-                                        <button class="btn btn-outline-danger btn-sm" @onclick="() => RemoveItem(item.Id)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <MudDivider />
                         }
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Order Summary</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Items (@cartItems.Sum(i => i.Quantity)):</span>
-                            <span>$@subtotal.ToString("F2")</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Shipping:</span>
-                            <span class="text-success">Free</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Tax:</span>
-                            <span>$@tax.ToString("F2")</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-3">
-                            <strong>Total:</strong>
-                            <strong class="text-primary">$@total.ToString("F2")</strong>
-                        </div>
-                        <button class="btn btn-success btn-lg w-100" disabled="@(!cartItems.Any())">
-                            <i class="bi bi-credit-card me-1"></i>
-                            Proceed to Checkout
-                        </button>
-                        <small class="text-muted d-block text-center mt-2">
-                            Secure checkout powered by our platform
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    }
+                </MudPaper>
+            </MudItem>
+            
+            <MudItem xs="12" lg="4">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-4">Order Summary</MudText>
+                    
+                    <MudGrid Class="mb-2">
+                        <MudItem xs="8">
+                            <MudText>Items (@cartItems.Sum(i => i.Quantity)):</MudText>
+                        </MudItem>
+                        <MudItem xs="4" Class="text-right">
+                            <MudText>$@subtotal.ToString("F2")</MudText>
+                        </MudItem>
+                    </MudGrid>
+                    
+                    <MudGrid Class="mb-2">
+                        <MudItem xs="8">
+                            <MudText>Shipping:</MudText>
+                        </MudItem>
+                        <MudItem xs="4" Class="text-right">
+                            <MudText Color="Color.Success">Free</MudText>
+                        </MudItem>
+                    </MudGrid>
+                    
+                    <MudGrid Class="mb-3">
+                        <MudItem xs="8">
+                            <MudText>Tax:</MudText>
+                        </MudItem>
+                        <MudItem xs="4" Class="text-right">
+                            <MudText>$@tax.ToString("F2")</MudText>
+                        </MudItem>
+                    </MudGrid>
+                    
+                    <MudDivider Class="mb-3" />
+                    
+                    <MudGrid Class="mb-4">
+                        <MudItem xs="8">
+                            <MudText Typo="Typo.h6">Total:</MudText>
+                        </MudItem>
+                        <MudItem xs="4" Class="text-right">
+                            <MudText Typo="Typo.h6" Color="Color.Primary">$@total.ToString("F2")</MudText>
+                        </MudItem>
+                    </MudGrid>
+                    
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Success" 
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.CreditCard"
+                               Disabled="@(!cartItems.Any())"
+                               Size="Size.Large"
+                               Class="mb-2">
+                        Proceed to Checkout
+                    </MudButton>
+                    
+                    <MudText Typo="Typo.caption" 
+                             Align="Align.Center" 
+                             Color="Color.Dark">
+                        Secure checkout powered by our platform
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
     }
-</div>
+</MudContainer>
 
 @code {
     private CartItem[]? cartItems;
     private string? errorMessage;
     private bool isLoading = true;
+    private Dictionary<int, string> quantityValues = new();
     
     private decimal subtotal => cartItems?.Sum(item => item.Product.Price * item.Quantity) ?? 0;
     private decimal tax => subtotal * 0.08m; // 8% tax
@@ -157,6 +231,16 @@
             isLoading = true;
             errorMessage = null;
             cartItems = await CartService.GetCartItemsAsync();
+            
+            // Initialize quantity values
+            quantityValues.Clear();
+            if (cartItems != null)
+            {
+                foreach (var item in cartItems)
+                {
+                    quantityValues[item.Id] = item.Quantity.ToString();
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -187,14 +271,15 @@
         catch (Exception ex)
         {
             errorMessage = "Failed to update item quantity. Please try again.";
+            Snackbar.Add("Failed to update quantity", Severity.Error);
             Console.WriteLine($"Error updating quantity: {ex.Message}");
             await LoadCartItems(); // Reload to reset state
         }
     }
 
-    private async Task UpdateQuantityFromInput(int itemId, string? valueString)
+    private async Task UpdateQuantityFromInput(int itemId, string quantityString)
     {
-        if (int.TryParse(valueString, out int newQuantity) && newQuantity > 0)
+        if (int.TryParse(quantityString, out int newQuantity) && newQuantity > 0)
         {
             await UpdateQuantity(itemId, newQuantity);
         }
@@ -211,10 +296,12 @@
         {
             await CartService.RemoveFromCartAsync(itemId);
             await LoadCartItems();
+            Snackbar.Add("Item removed from cart", Severity.Info);
         }
         catch (Exception ex)
         {
             errorMessage = "Failed to remove item from cart. Please try again.";
+            Snackbar.Add("Failed to remove item", Severity.Error);
             Console.WriteLine($"Error removing item: {ex.Message}");
         }
     }
@@ -225,10 +312,12 @@
         {
             await CartService.ClearCartAsync();
             await LoadCartItems();
+            Snackbar.Add("Cart cleared", Severity.Info);
         }
         catch (Exception ex)
         {
             errorMessage = "Failed to clear cart. Please try again.";
+            Snackbar.Add("Failed to clear cart", Severity.Error);
             Console.WriteLine($"Error clearing cart: {ex.Message}");
         }
     }

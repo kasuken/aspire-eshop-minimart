@@ -1,6 +1,7 @@
 using aspire_eshop_minimart.Web;
 using aspire_eshop_minimart.Web.Components;
 using aspire_eshop_minimart.Web.Services;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,9 @@ builder.AddRedisOutputCache("cache");
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Add MudBlazor services
+builder.Services.AddMudServices();
 
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
     {

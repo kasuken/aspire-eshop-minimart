@@ -6,116 +6,156 @@
 @inject CategoryApiClient CategoryClient
 @inject CartService CartService
 @inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
 <PageTitle>Products - Aspire eShop Minimart</PageTitle>
 
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>@GetPageTitle()</h1>
-        @if (selectedCategory != null)
-        {
-            <a href="/products" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>
-                All Products
-            </a>
-        }
-    </div>
+<MudContainer MaxWidth="MaxWidth.False">
+    <MudGrid AlignItems="Center.Center" Class="mb-4">
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h4">@GetPageTitle()</MudText>
+        </MudItem>
+        <MudItem xs="12" md="6" Class="text-right">
+            @if (selectedCategory != null)
+            {
+                <MudButton Variant="Variant.Outlined" 
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           Href="/products"
+                           Color="Color.Primary">
+                    All Products
+                </MudButton>
+            }
+        </MudItem>
+    </MudGrid>
 
     <!-- Category Filter -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Filter by Category</h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="/products" class="btn @(selectedCategoryId == null ? "btn-primary" : "btn-outline-primary") btn-sm">
-                            All Categories
-                        </a>
-                        @if (categories != null)
-                        {
-                            @foreach (var category in categories)
-                            {
-                                <a href="/products?category=@category.Id" class="btn @(selectedCategoryId == category.Id ? "btn-primary" : "btn-outline-primary") btn-sm">
-                                    @category.Name
-                                </a>
-                            }
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <MudPaper Class="pa-4 mb-4" Elevation="2">
+        <MudText Typo="Typo.h6" Class="mb-3">Filter by Category</MudText>
+        <MudGrid>
+            <MudItem>
+                <MudChip T="string" Variant="@(selectedCategoryId == null ? Variant.Filled : Variant.Outlined)"
+                         Color="Color.Primary"
+                         OnClick="() => NavigateToAllProducts()"
+                         Class="ma-1">
+                    All Categories
+                </MudChip>
+            </MudItem>
+            @if (categories != null)
+            {
+                @foreach (var category in categories)
+                {
+                    <MudItem>
+                        <MudChip T="string" Variant="@(selectedCategoryId == category.Id ? Variant.Filled : Variant.Outlined)"
+                                 Color="Color.Primary"
+                                 OnClick="() => NavigateToCategory(category.Id)"
+                                 Class="ma-1">
+                            @category.Name
+                        </MudChip>
+                    </MudItem>
+                }
+            }
+        </MudGrid>
+    </MudPaper>
 
     <!-- Products Grid -->
     @if (products == null)
     {
-        <div class="text-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
+        <MudGrid Justify="Justify.Center" Class="pa-8">
+            <MudItem Class="text-center">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                <MudText Typo="Typo.h6" Class="mt-4">Loading products...</MudText>
+            </MudItem>
+        </MudGrid>
     }
     else if (!products.Any())
     {
-        <div class="text-center py-5">
-            <i class="bi bi-search" style="font-size: 3rem; color: #6c757d;"></i>
-            <h3 class="text-muted mt-3">No products found</h3>
-            <p class="text-muted">Try selecting a different category</p>
-        </div>
+        <MudPaper Class="pa-8" Elevation="1">
+            <MudGrid Justify="Justify.Center">
+                <MudItem Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.SearchOff" Style="font-size: 4rem;" Color="Color.Dark" />
+                    <MudText Typo="Typo.h5" Color="Color.Dark" Class="mt-3">No products found</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Dark">Try selecting a different category</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
     }
     else
     {
-        <div class="row">
+        <MudGrid>
             @foreach (var product in products)
             {
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 product-card">
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudCard Elevation="4" Class="product-card mud-elevation-hover" Style="height: 100%;">
                         @if (product.IsFeatured)
                         {
-                            <div class="position-relative">
-                                <span class="position-absolute top-0 start-0 badge bg-warning text-dark m-2">
-                                    <i class="bi bi-star-fill me-1"></i>Featured
-                                </span>
+                            <div style="position: relative;">
+                                <MudChip T="string" Size="Size.Small" 
+                                         Color="Color.Warning" 
+                                         Icon="@Icons.Material.Filled.Star"
+                                         Style="position: absolute; top: 8px; left: 8px; z-index: 1;">
+                                    Featured
+                                </MudChip>
                             </div>
                         }
-                        <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;">
-                        <div class="card-body d-flex flex-column">
-                            <div class="mb-2">
-                                <span class="badge bg-secondary">@product.Category.Name</span>
+                        <MudCardMedia Image="@product.ImageUrl" Height="200" />
+                        <MudCardContent Class="d-flex flex-column" Style="height: calc(100% - 200px);">
+                            <div class="flex-grow-1">
+                                <MudChip T="string" Size="Size.Small" 
+                                         Color="Color.Secondary" 
+                                         Variant="Variant.Outlined"
+                                         Class="mb-2">
+                                    @product.Category.Name
+                                </MudChip>
+                                <MudText Typo="Typo.h6" Class="mb-2">@product.Name</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Dark" Class="mb-3">@product.Description</MudText>
                             </div>
-                            <h5 class="card-title">@product.Name</h5>
-                            <p class="card-text text-muted small flex-grow-1">@product.Description</p>
-                            <div class="mt-auto">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="h5 text-primary mb-0">$@product.Price.ToString("F2")</span>
-                                    <small class="text-muted">Stock: @product.StockQuantity</small>
-                                </div>
-                                <button class="btn btn-primary btn-sm w-100" @onclick="() => AddToCart(product.Id)" disabled="@(product.StockQuantity == 0)">
+                            <div>
+                                <MudGrid AlignItems="Center.Center" Class="mb-3">
+                                    <MudItem xs="6">
+                                        <MudText Typo="Typo.h5" Color="Color.Primary">$@product.Price.ToString("F2")</MudText>
+                                    </MudItem>
+                                    <MudItem xs="6" Class="text-right">
+                                        <MudText Typo="Typo.caption" Color="Color.Dark">Stock: @product.StockQuantity</MudText>
+                                    </MudItem>
+                                </MudGrid>
+                                <MudButton Variant="Variant.Filled" 
+                                           Color="Color.Primary" 
+                                           FullWidth="true"
+                                           StartIcon="@Icons.Material.Filled.AddShoppingCart"
+                                           OnClick="() => AddToCart(product.Id)"
+                                           Disabled="@(product.StockQuantity == 0 || isAddingToCart)"
+                                           Size="Size.Small">
                                     @if (product.StockQuantity == 0)
                                     {
                                         <span>Out of Stock</span>
                                     }
+                                    else if (isAddingToCart)
+                                    {
+                                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                                    }
                                     else
                                     {
-                                        <i class="bi bi-cart-plus me-1"></i>
                                         <span>Add to Cart</span>
                                     }
-                                </button>
+                                </MudButton>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
             }
-        </div>
+        </MudGrid>
     }
-</div>
+</MudContainer>
 
 <style>
     .product-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
         transition: all 0.3s ease;
+    }
+
+    .mud-elevation-hover:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
     }
 </style>
 
@@ -124,6 +164,7 @@
     private Category[]? categories;
     private Category? selectedCategory;
     private int? selectedCategoryId;
+    private bool isAddingToCart = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -161,6 +202,7 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading products data: {ex.Message}");
+            Snackbar.Add("Failed to load products. Please try again.", Severity.Error);
             categories = [];
             products = [];
         }
@@ -175,17 +217,37 @@
         return "All Products";
     }
 
+    private void NavigateToCategory(int categoryId)
+    {
+        Navigation.NavigateTo($"/products?category={categoryId}");
+    }
+
+    private void NavigateToAllProducts()
+    {
+        Navigation.NavigateTo("/products");
+    }
+
     private async Task AddToCart(int productId)
     {
+        if (isAddingToCart) return;
+        
         try
         {
+            isAddingToCart = true;
+            StateHasChanged();
+            
             await CartService.AddToCartAsync(productId, 1);
-            // You could add a toast notification here
+            Snackbar.Add("Product added to cart!", Severity.Success);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error adding to cart: {ex.Message}");
-            // You could show an error message to the user
+            Snackbar.Add("Failed to add product to cart. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            isAddingToCart = false;
+            StateHasChanged();
         }
     }
 }
