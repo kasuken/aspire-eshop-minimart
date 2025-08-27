@@ -45,20 +45,18 @@ git clone https://github.com/kasuken/aspire-eshop-minimart.git
 cd aspire-eshop-minimart
 ```
 
-### Run with .NET Aspire
-```sh
-dotnet run --project aspire-eshop-minimart.AppHost
-```
-This will start all backend services orchestrated by Aspire.
-
 ### Run the Frontend
 ```sh
 cd aspire-eshop-react
 npm install
 ```
 
-### Run with Docker
-You can build and run all services using Docker Compose or individual Dockerfiles for each service.
+### Run with .NET Aspire
+```sh
+dotnet run --project aspire-eshop-minimart.AppHost
+```
+This will start all backend services orchestrated by Aspire.
+
 
 ## 🧑‍💻 Demo Scenarios
 - Show service orchestration and health checks in Aspire AppHost
