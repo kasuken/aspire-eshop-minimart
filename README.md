@@ -1,4 +1,4 @@
-# aspire-eshop-minimart
+# Aspire eShop MiniMart
 
 A modern eShop demo project built to showcase the power and potential of **.NET Aspire** for cloud-native development. This solution combines a robust backend with a React frontend, demonstrating best practices for scalable, observable, and maintainable applications.
 
@@ -35,7 +35,7 @@ aspire-eshop-minimart.sln
 
 ## 🛠️ Getting Started
 ### Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download)
 - [Node.js & npm](https://nodejs.org/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
