@@ -1,5 +1,6 @@
 using aspire_eshop_minimart.Web;
 using aspire_eshop_minimart.Web.Components;
+using aspire_eshop_minimart.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,12 +17,29 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
+        client.Timeout = TimeSpan.FromSeconds(30);
     });
 
 builder.Services.AddHttpClient<ProductApiClient>(client =>
     {
         client.BaseAddress = new("https+http://apiservice");
+        client.Timeout = TimeSpan.FromSeconds(30);
     });
+
+builder.Services.AddHttpClient<CategoryApiClient>(client =>
+    {
+        client.BaseAddress = new("https+http://apiservice");
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+builder.Services.AddHttpClient<CartApiClient>(client =>
+    {
+        client.BaseAddress = new("https+http://apiservice");
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+// Register cart service as scoped
+builder.Services.AddScoped<CartService>();
 
 var app = builder.Build();
 

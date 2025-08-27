@@ -1,0 +1,59 @@
+@using aspire_eshop_minimart.Web.Services
+@inject CartService CartService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+@implements IDisposable
+
+<div class="position-relative">
+    <button class="btn btn-outline-light position-relative" @onclick="NavigateToCart">
+        <i class="bi bi-cart3"></i>
+        @if (itemCount > 0)
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @itemCount
+                <span class="visually-hidden">items in cart</span>
+            </span>
+        }
+    </button>
+</div>
+
+@code {
+    private int itemCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CartService.OnCartChanged += HandleCartChanged;
+        await UpdateCartCount();
+    }
+
+    private async Task UpdateCartCount()
+    {
+        try
+        {
+            itemCount = await CartService.GetCartItemCountAsync();
+        }
+        catch
+        {
+            itemCount = 0;
+        }
+    }
+
+    private void NavigateToCart()
+    {
+        Navigation.NavigateTo("/cart");
+    }
+
+    private async void HandleCartChanged()
+    {
+        await InvokeAsync(async () =>
+        {
+            await UpdateCartCount();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        CartService.OnCartChanged -= HandleCartChanged;
+    }
+}

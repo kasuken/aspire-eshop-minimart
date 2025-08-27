@@ -1,0 +1,248 @@
+@page "/cart"
+@using aspire_eshop_minimart.Web
+@using aspire_eshop_minimart.Web.Services
+@inject CartService CartService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+@implements IDisposable
+
+<PageTitle>Shopping Cart - Aspire eShop Minimart</PageTitle>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Shopping Cart</h1>
+        <a href="/products" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i>
+            Continue Shopping
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @errorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading your cart...</p>
+        </div>
+    }
+    else if (cartItems == null || !cartItems.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x" style="font-size: 4rem; color: #6c757d;"></i>
+            <h3 class="text-muted mt-3">Your cart is empty</h3>
+            <p class="text-muted">Add some products to get started!</p>
+            <a href="/products" class="btn btn-primary">
+                <i class="bi bi-bag me-1"></i>
+                Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Cart Items (@cartItems.Sum(i => i.Quantity) items)</h5>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="ClearCart">
+                            <i class="bi bi-trash me-1"></i>
+                            Clear Cart
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        @foreach (var item in cartItems)
+                        {
+                            <div class="border-bottom p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-4">
+                                        <h6 class="mb-1">@item.Product.Name</h6>
+                                        <small class="text-muted">@item.Product.Category.Name</small>
+                                        <br>
+                                        <small class="text-muted">$@item.Product.Price.ToString("F2") each</small>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-secondary" type="button" @onclick="() => UpdateQuantity(item.Id, item.Quantity - 1)">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="number" class="form-control text-center" value="@item.Quantity" min="1" @onchange="@(async (e) => await UpdateQuantityFromInput(item.Id, e.Value?.ToString()))">
+                                            <button class="btn btn-outline-secondary" type="button" @onclick="() => UpdateQuantity(item.Id, item.Quantity + 1)">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 text-end">
+                                        <strong class="text-primary">$@((item.Product.Price * item.Quantity).ToString("F2"))</strong>
+                                    </div>
+                                    <div class="col-1 text-end">
+                                        <button class="btn btn-outline-danger btn-sm" @onclick="() => RemoveItem(item.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Items (@cartItems.Sum(i => i.Quantity)):</span>
+                            <span>$@subtotal.ToString("F2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping:</span>
+                            <span class="text-success">Free</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax:</span>
+                            <span>$@tax.ToString("F2")</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total:</strong>
+                            <strong class="text-primary">$@total.ToString("F2")</strong>
+                        </div>
+                        <button class="btn btn-success btn-lg w-100" disabled="@(!cartItems.Any())">
+                            <i class="bi bi-credit-card me-1"></i>
+                            Proceed to Checkout
+                        </button>
+                        <small class="text-muted d-block text-center mt-2">
+                            Secure checkout powered by our platform
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private CartItem[]? cartItems;
+    private string? errorMessage;
+    private bool isLoading = true;
+    
+    private decimal subtotal => cartItems?.Sum(item => item.Product.Price * item.Quantity) ?? 0;
+    private decimal tax => subtotal * 0.08m; // 8% tax
+    private decimal total => subtotal + tax;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CartService.OnCartChanged += HandleCartChanged;
+        await LoadCartItems();
+    }
+
+    private async Task LoadCartItems()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            cartItems = await CartService.GetCartItemsAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to load cart items. Please try again.";
+            cartItems = [];
+            Console.WriteLine($"Error loading cart items: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task UpdateQuantity(int itemId, int newQuantity)
+    {
+        if (newQuantity <= 0)
+        {
+            await RemoveItem(itemId);
+            return;
+        }
+
+        try
+        {
+            await CartService.UpdateCartItemAsync(itemId, newQuantity);
+            await LoadCartItems();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to update item quantity. Please try again.";
+            Console.WriteLine($"Error updating quantity: {ex.Message}");
+            await LoadCartItems(); // Reload to reset state
+        }
+    }
+
+    private async Task UpdateQuantityFromInput(int itemId, string? valueString)
+    {
+        if (int.TryParse(valueString, out int newQuantity) && newQuantity > 0)
+        {
+            await UpdateQuantity(itemId, newQuantity);
+        }
+        else
+        {
+            // Reload to reset the value if invalid
+            await LoadCartItems();
+        }
+    }
+
+    private async Task RemoveItem(int itemId)
+    {
+        try
+        {
+            await CartService.RemoveFromCartAsync(itemId);
+            await LoadCartItems();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to remove item from cart. Please try again.";
+            Console.WriteLine($"Error removing item: {ex.Message}");
+        }
+    }
+
+    private async Task ClearCart()
+    {
+        try
+        {
+            await CartService.ClearCartAsync();
+            await LoadCartItems();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to clear cart. Please try again.";
+            Console.WriteLine($"Error clearing cart: {ex.Message}");
+        }
+    }
+
+    private async void HandleCartChanged()
+    {
+        await InvokeAsync(async () =>
+        {
+            await LoadCartItems();
+        });
+    }
+
+    public void Dispose()
+    {
+        CartService.OnCartChanged -= HandleCartChanged;
+    }
+}

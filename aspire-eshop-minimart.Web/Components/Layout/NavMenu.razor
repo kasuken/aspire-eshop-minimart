@@ -1,6 +1,14 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using aspire_eshop_minimart.Web.Components.Shared
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">aspire-eshop-minimart</a>
+        <a class="navbar-brand" href="">
+            <i class="bi bi-shop me-2"></i>
+            Aspire eShop Minimart
+        </a>
+        <div class="d-flex align-items-center">
+            <CartComponent />
+        </div>
     </div>
 </div>
 
@@ -17,6 +25,12 @@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="products">
                 <span class="bi bi-bag-fill" aria-hidden="true"></span> Products
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="cart">
+                <span class="bi bi-cart3" aria-hidden="true"></span> Shopping Cart
             </NavLink>
         </div>
 
