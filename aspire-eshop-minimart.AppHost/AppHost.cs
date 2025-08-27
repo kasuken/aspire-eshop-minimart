@@ -27,8 +27,7 @@ builder.AddNpmApp("react-frontend", "../aspire-eshop-react", "dev")
     .WithReference(apiService)
     .WaitFor(apiService)
     .WithEnvironment("VITE_API_URL", apiService.GetEndpoint("api"))
-    //.WithHttpEndpoint(port: 3001, env: "PORT")
+    .WithHttpEndpoint(port: 3000, env: "PORT")
     .WithExternalHttpEndpoints();
-    //.PublishAsDockerFile();
 
 builder.Build().Run();

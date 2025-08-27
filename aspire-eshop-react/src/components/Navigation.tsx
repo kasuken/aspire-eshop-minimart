@@ -68,32 +68,6 @@ export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
           <ListItemText primary="Shopping Cart" />
         </ListItemButton>
       </ListItem>
-
-      <Divider sx={{ my: 1 }} />
-
-      <ListItem disablePadding>
-        <ListItemButton
-          selected={isActive('/counter')}
-          onClick={() => handleNavigation('/counter')}
-        >
-          <ListItemIcon>
-            <AddIcon />
-          </ListItemIcon>
-          <ListItemText primary="Counter" />
-        </ListItemButton>
-      </ListItem>
-
-      <ListItem disablePadding>
-        <ListItemButton
-          selected={isActive('/weather')}
-          onClick={() => handleNavigation('/weather')}
-        >
-          <ListItemIcon>
-            <CloudIcon />
-          </ListItemIcon>
-          <ListItemText primary="Weather" />
-        </ListItemButton>
-      </ListItem>
     </List>
   );
 };
