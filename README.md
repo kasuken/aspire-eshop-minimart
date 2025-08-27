@@ -2,6 +2,18 @@
 
 A modern eShop demo project built to showcase the power and potential of **.NET Aspire** for cloud-native development. This solution combines a robust backend with a React frontend, demonstrating best practices for scalable, observable, and maintainable applications.
 
+## Blazor Frontend
+
+<img width="2495" height="1466" alt="image" src="https://github.com/user-attachments/assets/284b30c5-cca2-4fdd-82a0-af91162eb1f3" />
+
+## Read Frontend
+
+<img width="2470" height="1162" alt="image" src="https://github.com/user-attachments/assets/2b4caf0d-4335-4a77-a92c-f1d84c021b43" />
+
+## .NET Aspire Dashboard
+
+<img width="2490" height="495" alt="image" src="https://github.com/user-attachments/assets/51ffffb4-d53e-4af0-a3b2-7a130f5a1582" />
+
 ---
 
 ## 🚀 Purpose
